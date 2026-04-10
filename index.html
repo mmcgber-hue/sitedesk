@@ -15,7 +15,7 @@
   --font-body:'Inter',sans-serif;--font-display:'Barlow Condensed',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;max-width:480px;margin:0 auto;padding-bottom:90px;font-size:16px;line-height:1.5}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;max-width:480px;margin:0 auto;padding-bottom:24px;font-size:16px;line-height:1.5}
 
 /* AUTH */
 .auth-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:30px 24px}
@@ -296,14 +296,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-hei
 .submit-btn{width:100%;padding:16px;background:var(--accent);border:none;border-radius:14px;font-family:var(--font-display);font-size:20px;font-weight:800;color:#000;cursor:pointer;margin-top:8px;min-height:54px;letter-spacing:0.3px}
 .submit-btn:active{opacity:0.85}
 
-/* BOTTOM NAV */
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--surface);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);padding:8px 0 22px;z-index:100}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;opacity:0.4;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text)}
-.nav-item.active{opacity:1;color:var(--accent)}
-.nav-icon{font-size:24px}
-
 /* TOAST */
-.toast{position:fixed;bottom:105px;left:50%;transform:translateX(-50%);background:var(--green);color:#000;font-weight:700;padding:12px 22px;border-radius:24px;font-family:var(--font-display);font-size:16px;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--green);color:#000;font-weight:700;padding:12px 22px;border-radius:24px;font-family:var(--font-display);font-size:16px;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
 .empty-state{text-align:center;padding:44px 20px;color:var(--muted)}
 .empty-state .big{font-size:52px;margin-bottom:12px}
@@ -360,12 +354,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-hei
     <button class="add-btn" onclick="openModal()">+ Add Project</button>
   </div>
   <div class="projects-list" id="projects-list"></div>
-  <div class="bottom-nav">
-    <div class="nav-item active"><div class="nav-icon">🏗️</div>Projects</div>
-    <div class="nav-item"><div class="nav-icon">✅</div>Tasks</div>
-    <div class="nav-item"><div class="nav-icon">📁</div>Files</div>
-    <div class="nav-item"><div class="nav-icon">👷</div>Trades</div>
-  </div>
 </div>
 
 <div class="panel-overlay" id="panel-overlay" onclick="closePanel()"></div>
@@ -377,12 +365,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-hei
   </div>
   <div class="panel-tabs">
     <div class="ptab active" onclick="switchTab('site')">📍Site</div>
-    <div class="ptab" onclick="switchTab('photos')">📸Photo</div>
+    <div class="ptab" onclick="switchTab('photos')">📸Photos</div>
     <div class="ptab" onclick="switchTab('drawing')">📐Plan</div>
     <div class="ptab" onclick="switchTab('costs')">💰Costs</div>
     <div class="ptab" onclick="switchTab('hours')">⏱️Hours</div>
     <div class="ptab" onclick="switchTab('materials')">🧱Mats</div>
-    <div class="ptab" onclick="switchTab('files')">📁Files</div>
+    <div class="ptab" onclick="switchTab('tasks')">✅Tasks</div>
   </div>
   <div class="ptab-content active" id="tab-site"></div>
   <div class="ptab-content" id="tab-photos"></div>
@@ -390,7 +378,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-hei
   <div class="ptab-content" id="tab-costs"></div>
   <div class="ptab-content" id="tab-hours"></div>
   <div class="ptab-content" id="tab-materials"></div>
-  <div class="ptab-content" id="tab-files"></div>
+  <div class="ptab-content" id="tab-tasks"></div>
 </div>
 
 <div class="lightbox" id="lightbox">
@@ -410,6 +398,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-hei
   <div class="photo-detail-body">
     <div class="photo-detail-meta" id="pd-meta"></div>
     <div class="photo-detail-note" id="pd-note"></div>
+    <div id="pd-edit"></div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:8px">Notes</div>
     <div class="photo-comments" id="pd-comments"></div>
     <div class="photo-comment-form">
       <input class="photo-comment-input" id="pd-comment-input" placeholder="Add a note or comment..." onkeydown="if(event.key==='Enter')addPhotoComment()">
@@ -604,7 +594,7 @@ function render(){
 
 function switchTab(tab){
   currentTab=tab;
-  document.querySelectorAll('.ptab').forEach((t,i)=>t.classList.toggle('active',['site','photos','drawing','costs','hours','materials','files'][i]===tab));
+  document.querySelectorAll('.ptab').forEach((t,i)=>t.classList.toggle('active',['site','photos','drawing','costs','hours','materials','tasks'][i]===tab));
   document.querySelectorAll('.ptab-content').forEach(c=>c.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
 }
@@ -629,20 +619,20 @@ function renderAllTabs(id){
   const lc=tHours(p),mc=tMats(p),tc=lc+mc,margin=(f.quoted||0)-tc,mp=f.quoted?Math.round((margin/f.quoted)*100):0;
   const sid=id.replace(/-/g,'');
 
-  // SITE TAB
+  // SITE TAB — clean, info + subs only
   const subColors=['#3b82f6','#22c55e','#f59e0b','#ef4444','#8b5cf6','#ec4899','#14b8a6','#f97316'];
   const subsHTML=!p.subs?.length?'<div class="empty-note">No subs added yet</div>':p.subs.map((s,i)=>`<div class="sub-item"><div class="sub-avatar" style="background:${s.color}22;color:${s.color};border:1px solid ${s.color}44">${s.name.split(' ').map(n=>n[0]).join('').slice(0,2)}</div><div class="sub-info"><div class="sub-name">${s.name}</div><div class="sub-trade">${s.trade||'—'} · ${s.phone||'—'}</div></div><div class="sub-actions"><button class="sub-btn" onclick="callSub('${(s.phone||'').replace(/'/g,"\\'")}')">📞</button><button class="sub-btn" onclick="waSub('${(s.phone||'').replace(/'/g,"\\'")}','${p.name.replace(/'/g,"\\'")}')">💬</button><button class="sub-btn" style="font-size:14px;color:var(--muted)" onclick="delSub('${id}',${i})">✕</button></div></div>`).join('');
-  const tasksHTML=!p.tasks?.length?'<div class="empty-note">No tasks yet</div>':p.tasks.map((t,i)=>`<div class="task-item"><div class="task-check ${t.done?'done':''}" onclick="toggleTask('${id}',${i})">${t.done?'✓':''}</div><span class="task-text ${t.done?'done':''}">${t.text}</span><span class="task-due">${t.due||''}</span><button class="file-delete" style="margin-left:auto" onclick="delTask('${id}',${i})">✕</button></div>`).join('');
   document.getElementById('tab-site').innerHTML=`
-<div class="panel-section"><div class="panel-section-title" style="display:flex;align-items:center;justify-content:space-between">Site Info <button class="edit-project-btn" onclick="openEditModal('${id}')">✏️ Edit</button></div>
-<div class="info-row"><span class="info-icon">📍</span><span class="info-label">Address</span><span class="info-val">${p.address}</span><button class="copy-btn" onclick="copyText('${p.address.replace(/'/g,"\\'")}')">📋</button></div>
-<div class="info-row"><span class="info-icon">🔑</span><span class="info-label">Gate</span><span class="info-val">${p.gate}</span><button class="copy-btn" onclick="copyText('${p.gate.replace(/'/g,"\\'")}')">📋</button></div>
-<div class="info-row"><span class="info-icon">👤</span><span class="info-label">Client</span><span class="info-val">${p.client}</span></div>
-<div class="info-row"><span class="info-icon">📊</span><span class="info-label">Progress</span><span class="info-val">${p.progress}% complete</span></div>
+<div class="panel-section">
+  <div class="panel-section-title" style="display:flex;align-items:center;justify-content:space-between">Site Info <button class="edit-project-btn" onclick="openEditModal('${id}')">✏️ Edit</button></div>
+  <div class="info-row"><span class="info-icon">📍</span><span class="info-label">Address</span><span class="info-val">${p.address}</span><button class="copy-btn" onclick="copyText('${p.address.replace(/'/g,"\\'")}')">📋</button></div>
+  <div class="info-row"><span class="info-icon">🔑</span><span class="info-label">Gate</span><span class="info-val">${p.gate}</span><button class="copy-btn" onclick="copyText('${p.gate.replace(/'/g,"\\'")}')">📋</button></div>
+  <div class="info-row"><span class="info-icon">👤</span><span class="info-label">Client</span><span class="info-val">${p.client}</span></div>
+  <div class="info-row" style="border-bottom:none"><span class="info-icon">📊</span><span class="info-label">Progress</span><span class="info-val">${p.progress}% complete</span></div>
 </div>
 <div class="panel-section">
-  <div class="panel-section-title">Subcontractors</div>
-  <div class="sub-list" id="sub-list-${sid}">${subsHTML}</div>
+  <div class="panel-section-title">👷 Subcontractors</div>
+  <div class="sub-list">${subsHTML}</div>
   <div class="add-log-form" style="margin-top:12px">
     <div class="add-log-title">Add Subcontractor</div>
     <div class="log-grid">
@@ -652,24 +642,10 @@ function renderAllTabs(id){
     <div class="log-grid">
       <div class="fin-input-group"><div class="fin-input-label">Phone</div><input class="fin-input" id="sp${sid}" type="tel" placeholder="087 123 4567"/></div>
       <div class="fin-input-group"><div class="fin-input-label">Colour</div>
-        <select class="fin-input" id="sc${sid}">
-          ${subColors.map((c,i)=>`<option value="${c}" style="background:${c}">${['Blue','Green','Amber','Red','Purple','Pink','Teal','Orange'][i]}</option>`).join('')}
-        </select>
+        <select class="fin-input" id="sc${sid}">${subColors.map((c,i)=>`<option value="${c}">${['Blue','Green','Amber','Red','Purple','Pink','Teal','Orange'][i]}</option>`).join('')}</select>
       </div>
     </div>
     <button class="add-log-btn" style="background:var(--accent2);color:#fff" onclick="addSub('${id}')">+ Add Sub</button>
-  </div>
-</div>
-<div class="panel-section">
-  <div class="panel-section-title">Tasks</div>
-  <div class="task-list" id="task-list-${sid}">${tasksHTML}</div>
-  <div class="add-log-form" style="margin-top:12px">
-    <div class="add-log-title">Add Task</div>
-    <div class="log-grid">
-      <div class="fin-input-group" style="grid-column:1/-1"><div class="fin-input-label">Task</div><input class="fin-input" id="tt${sid}" placeholder="e.g. Fix roof flashing" onkeydown="if(event.key==='Enter')addTask('${id}')"/></div>
-    </div>
-    <div class="fin-input-group" style="margin-bottom:10px"><div class="fin-input-label">Due Date (optional)</div><input class="fin-input" id="td${sid}" placeholder="e.g. 15/04" /></div>
-    <button class="add-log-btn" onclick="addTask('${id}')">+ Add Task</button>
   </div>
 </div>
 <div class="panel-actions">
@@ -677,36 +653,45 @@ function renderAllTabs(id){
   <button class="action-btn" onclick="copyText('${p.gate.replace(/'/g,"\\'")}')">🔑 Copy Gate</button>
 </div>`;
 
-  // PHOTOS TAB
+  // PHOTOS TAB — cleaner UX, no pre-capture fields, report button prominent
   const photos=p.photos||[];
   const stages=['Before','During','After','Defect','Completion'];
-  const pgHTML=photos.length===0?'<div class="empty-note">📸 No photos yet — take your first site photo</div>':photos.map((ph,i)=>{
-    const stageBadge=ph.stage?`<div style="position:absolute;top:5px;left:5px;background:rgba(0,0,0,0.75);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:0.5px">${ph.stage}</div>`:'';
-    return`<div class="photo-thumb" onclick="openPhotoDetail('${id}',${i})"><img src="${ph.url}" loading="lazy">${stageBadge}<div class="photo-thumb-note">${ph.note||fmtDate(ph.ts)}</div><button class="photo-thumb-del" onclick="delPhoto(event,'${id}',${i})">✕</button></div>`;
-  }).join('');
-  document.getElementById('tab-photos').innerHTML=`<div class="panel-section"><div class="panel-section-title" style="display:flex;align-items:center;justify-content:space-between">📸 Photo Diary <span style="color:var(--muted);font-size:12px">${photos.length} photos</span></div>
-  <div style="display:flex;gap:8px;margin-bottom:10px">
-    <button class="photo-upload-btn" style="margin-bottom:0;flex:1" onclick="triggerPhoto('${id}')">📷 Add Photo</button>
-    ${photos.length>0?`<button class="photo-upload-btn" style="margin-bottom:0;flex:1;border-color:var(--accent2);color:var(--accent2)" onclick="generatePhotoReport('${id}')">📋 PDF Report</button>`:''}
-  </div>
+  const stageColors={Before:'#3b82f6',During:'#f59e0b',After:'#22c55e',Defect:'#ef4444',Completion:'#8b5cf6'};
+  const pgHTML=photos.length===0
+    ?`<div class="empty-note" style="padding:40px 20px;text-align:center">
+        <div style="font-size:48px;margin-bottom:12px">📸</div>
+        <div style="font-weight:600;margin-bottom:6px">No photos yet</div>
+        <div style="font-size:13px">Tap the button above to take your first site photo</div>
+      </div>`
+    :photos.map((ph,i)=>{
+        const sc=stageColors[ph.stage]||'#6b7a99';
+        const stageBadge=ph.stage?`<div style="position:absolute;top:5px;left:5px;background:${sc};color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:0.5px;text-shadow:none">${ph.stage}</div>`:'';
+        const gps=ph.lat?`<div style="position:absolute;bottom:22px;right:5px;background:rgba(0,0,0,0.6);color:#fff;font-size:7px;padding:1px 4px;border-radius:3px">📍GPS</div>`:'';
+        return`<div class="photo-thumb" onclick="openPhotoDetail('${id}',${i})"><img src="${ph.url}" loading="lazy">${stageBadge}${gps}<div class="photo-thumb-note">${ph.note||fmtDate(ph.ts)}</div><button class="photo-thumb-del" onclick="delPhoto(event,'${id}',${i})">✕</button></div>`;
+      }).join('');
+  document.getElementById('tab-photos').innerHTML=`
+<div class="panel-section">
+  <div class="panel-section-title" style="display:flex;align-items:center;justify-content:space-between">📸 Photo Diary<span style="color:var(--muted);font-size:12px;font-weight:400">${photos.length} photo${photos.length!==1?'s':''}</span></div>
+  <button class="photo-upload-btn" onclick="triggerPhoto('${id}')">📷 Take / Upload Photo</button>
   <div id="photo-uploading-${sid}" style="display:none"><div class="uploading-indicator">⏳ Uploading photo...</div></div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px" id="stage-filter-${sid}">
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" id="stage-filter-${sid}">
     <button class="stage-filter-btn active" onclick="filterPhotos('${id}','all',this)">All</button>
     ${stages.map(s=>`<button class="stage-filter-btn" onclick="filterPhotos('${id}','${s}',this)">${s}</button>`).join('')}
   </div>
   <div class="photo-grid" id="photo-grid-${sid}">${pgHTML}</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
-    <div class="fin-input-group"><div class="fin-input-label">Caption</div><input class="fin-input" id="photo-note-${sid}" placeholder="What's in this photo?"/></div>
-    <div class="fin-input-group"><div class="fin-input-label">Stage</div><select class="fin-input" id="photo-stage-${sid}"><option value="">— Select stage</option>${stages.map(s=>`<option value="${s}">${s}</option>`).join('')}</select></div>
-  </div></div>`;
+</div>
+${photos.length>0?`<div class="panel-section" style="border-bottom:none">
+  <button class="save-fin-btn" style="background:var(--surface2);color:var(--text);border:1px solid var(--border)" onclick="generatePhotoReport('${id}')">📋 Download Site Report</button>
+  <div style="font-size:12px;color:var(--muted);text-align:center;margin-top:8px">Opens as HTML · Print to PDF from browser</div>
+</div>`:''}`;
 
   // DRAWING TAB
   renderDrawingTab(id);
 
-  // COSTS TAB — outcome buttons stacked for easy mobile tapping
+  // COSTS TAB
   const wc=f.outcome==='won'?'active-won':'',llc=f.outcome==='lost'?'active-lost':'',pc2=f.outcome==='pending'?'active-pending':'';
   document.getElementById('tab-costs').innerHTML=`<div class="panel-section"><div class="panel-section-title">Cost Breakdown</div><div class="cost-summary"><div class="cost-row"><span class="cost-row-label">Labour</span><span class="cost-row-val" style="color:var(--accent2)">${fmtF(lc)}</span></div><div class="cost-row"><span class="cost-row-label">Materials</span><span class="cost-row-val" style="color:var(--accent)">${fmtF(mc)}</span></div><div class="cost-row total"><span class="cost-row-label">Total Costs</span><span class="cost-row-val" style="color:var(--orange)">${fmtF(tc)}</span></div><div class="cost-row"><span class="cost-row-label">Quote Value</span><span class="cost-row-val" style="color:var(--accent2)">${fmtF(f.quoted)}</span></div><div class="cost-row ${margin>=0?'margin-good':'margin-bad'}"><span class="cost-row-label" style="font-weight:600;color:var(--text)">Margin</span><span class="cost-row-val" style="color:${margin>=0?'var(--green)':'var(--red)'}">${fmtF(margin)} (${mp}%)</span></div></div><div class="fin-grid"><div class="fin-box"><div class="fin-box-label">Invoiced</div><div class="fin-box-val amber">${fmtF(f.invoiced)}</div></div><div class="fin-box"><div class="fin-box-label">Paid</div><div class="fin-box-val green">${fmtF(f.paid)}</div></div><div class="fin-box"><div class="fin-box-label">Outstanding</div><div class="fin-box-val ${owed>0?'red':'green'}">${owed>0?fmtF(owed):'Clear ✓'}</div></div><div class="fin-box"><div class="fin-box-label">Quote</div><div class="fin-box-val blue">${fmtF(f.quoted)}</div></div></div>
-  <div class="panel-section-title" style="margin-bottom:10px">Quote Outcome</div>
+  <div class="panel-section-title" style="margin-top:16px;margin-bottom:10px">Quote Outcome</div>
   <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
     <button class="outcome-btn ${wc}" onclick="setOutcome('${id}','won')" style="width:100%">✓ Won — Job Secured</button>
     <button class="outcome-btn ${llc}" onclick="setOutcome('${id}','lost')" style="width:100%">✗ Lost — Quote Rejected</button>
@@ -722,9 +707,26 @@ function renderAllTabs(id){
   const mHTML=!p.materials?.length?'<div class="empty-note">🧱 No materials logged yet</div>':p.materials.map((m,i)=>`<div class="log-item"><div class="log-item-info"><div class="log-item-main">${m.name}</div><div class="log-item-sub">${m.supplier||'—'} · ${m.qty} ${m.unit||'units'} @ €${m.cost} each</div></div><span class="log-item-cost">${fmtF(m.qty*m.cost)}</span><button class="file-delete" onclick="delMat('${id}',${i})">✕</button></div>`).join('');
   document.getElementById('tab-materials').innerHTML=`<div class="panel-section"><div class="panel-section-title">Materials Used <span style="color:var(--accent);margin-left:8px">${fmtF(mc)} total</span></div><div class="log-list">${mHTML}</div><div class="add-log-form"><div class="add-log-title">Add Material</div><div class="log-grid"><div class="fin-input-group"><div class="fin-input-label">Material</div><input class="fin-input" id="mn${sid}" placeholder="e.g. Plasterboard 12mm"/></div><div class="fin-input-group"><div class="fin-input-label">Supplier</div><input class="fin-input" id="ms${sid}" placeholder="e.g. Murdocks"/></div></div><div class="log-grid-3"><div class="fin-input-group"><div class="fin-input-label">Qty</div><input class="fin-input" id="mq${sid}" type="number" placeholder="10"/></div><div class="fin-input-group"><div class="fin-input-label">Unit</div><input class="fin-input" id="mu${sid}" placeholder="sheets"/></div><div class="fin-input-group"><div class="fin-input-label">€/unit</div><input class="fin-input" id="mc${sid}" type="number" placeholder="18"/></div></div><button class="add-log-btn" style="background:var(--accent);color:#000" onclick="addMat('${id}')">+ Add Material</button></div></div>`;
 
-  // FILES TAB
-  const fHTML=!p.files?.length?'<div class="empty-note">📂 No files yet</div>':p.files.map((file,fi)=>{const ic=fIcon(file.url);return`<a class="file-item" href="${file.url}" target="_blank" onclick="event.stopPropagation()"><div class="file-icon ${ic.c}">${ic.i}</div><div class="file-info"><div class="file-name">${file.name}</div><div class="file-meta">${tAgo(file.added)}</div></div><button class="file-delete" onclick="delFile(event,'${id}',${fi})">✕</button></a>`;}).join('');
-  document.getElementById('tab-files').innerHTML=`<div class="panel-section"><div class="panel-section-title">📁 Files & Documents</div><div class="files-list">${fHTML}</div><div class="add-file-form"><div class="fin-input-label" style="margin-bottom:8px">Add Google Drive / Dropbox link</div><input class="fin-input" id="fn${sid}" placeholder="Name (e.g. Structural Drawings Rev3)" style="margin-bottom:10px"/><input class="fin-input" id="fu${sid}" placeholder="Paste share link..." style="margin-bottom:10px"/><button class="add-file-btn" onclick="addFile('${id}')">+ Add File Link</button></div></div>`;
+  // TASKS TAB — moved from site tab, own dedicated tab
+  const taskDone=p.tasks?.filter(t=>t.done).length||0;
+  const taskTotal=p.tasks?.length||0;
+  const tasksHTML=!p.tasks?.length
+    ?`<div class="empty-note"><div style="font-size:36px;margin-bottom:10px">✅</div><div>No tasks yet — add one below</div></div>`
+    :p.tasks.map((t,i)=>`<div class="task-item"><div class="task-check ${t.done?'done':''}" onclick="toggleTask('${id}',${i})">${t.done?'✓':''}</div><span class="task-text ${t.done?'done':''}">${t.text}</span>${t.due?`<span class="task-due">${t.due}</span>`:''}<button class="file-delete" style="margin-left:auto;flex-shrink:0" onclick="delTask('${id}',${i})">✕</button></div>`).join('');
+  document.getElementById('tab-tasks').innerHTML=`
+<div class="panel-section">
+  <div class="panel-section-title" style="display:flex;align-items:center;justify-content:space-between">
+    ✅ Tasks
+    ${taskTotal?`<span style="font-size:12px;font-weight:600;color:var(--green)">${taskDone}/${taskTotal} done</span>`:''}
+  </div>
+  <div class="task-list">${tasksHTML}</div>
+  <div class="add-log-form" style="margin-top:12px">
+    <div class="add-log-title">Add Task</div>
+    <div class="fin-input-group" style="margin-bottom:10px"><div class="fin-input-label">Task</div><input class="fin-input" id="tt${sid}" placeholder="e.g. Fix roof flashing" onkeydown="if(event.key==='Enter')addTask('${id}')"/></div>
+    <div class="fin-input-group" style="margin-bottom:10px"><div class="fin-input-label">Due Date (optional)</div><input class="fin-input" id="td${sid}" placeholder="e.g. 15/04"/></div>
+    <button class="add-log-btn" onclick="addTask('${id}')">+ Add Task</button>
+  </div>
+</div>`;
 }
 
 // ── DRAWING / PDF TAB ──
@@ -867,25 +869,41 @@ function triggerPhoto(id){
   cap.onchange=function(){handlePhotoCapture(this,id);};
   cap.click();
 }
+
+// Get GPS position as a promise
+function getGPS(){
+  return new Promise(res=>{
+    if(!navigator.geolocation){res(null);return;}
+    navigator.geolocation.getCurrentPosition(
+      pos=>res({lat:pos.coords.latitude.toFixed(6),lng:pos.coords.longitude.toFixed(6),acc:Math.round(pos.coords.accuracy)}),
+      ()=>res(null),
+      {timeout:5000,maximumAge:30000}
+    );
+  });
+}
+
 async function handlePhotoCapture(input,id){
   const file=input.files[0];if(!file)return;
   const p=projects.find(p=>p.id===id);if(!p)return;
   const sid=id.replace(/-/g,'');
   const uploading=document.getElementById('photo-uploading-'+sid);
   if(uploading)uploading.style.display='block';
-  const url=await uploadFile(file,'photos');
+  // Capture GPS and upload in parallel
+  const[url,gps]=await Promise.all([uploadFile(file,'photos'),getGPS()]);
   if(!url){if(uploading)uploading.style.display='none';showToast('Upload failed');return;}
-  const noteEl=document.getElementById('photo-note-'+sid);
-  const stageEl=document.getElementById('photo-stage-'+sid);
-  const note=noteEl?noteEl.value.trim():'';
-  const stage=stageEl?stageEl.value:'';
   if(!p.photos)p.photos=[];
-  p.photos.unshift({url,note,stage,ts:Date.now(),comments:[]});
-  await saveProject(p);if(uploading)uploading.style.display='none';
-  if(noteEl)noteEl.value='';
-  if(stageEl)stageEl.value='';
-  render();renderAllTabs(id);switchTab('photos');showToast('Photo saved ✓');input.value='';
+  const newPhoto={url,note:'',stage:'',ts:Date.now(),comments:[],lat:gps?.lat||null,lng:gps?.lng||null,gpsAcc:gps?.acc||null};
+  p.photos.unshift(newPhoto);
+  await saveProject(p);
+  if(uploading)uploading.style.display='none';
+  render();renderAllTabs(id);switchTab('photos');
+  showToast('Photo saved ✓'+(gps?' 📍':' (no GPS)'));
+  input.value='';
+  // Auto-open detail so user can add caption/stage immediately
+  const newIdx=0;
+  setTimeout(()=>openPhotoDetail(id,newIdx),300);
 }
+
 async function delPhoto(e,id,idx){
   e.stopPropagation();
   const p=projects.find(p=>p.id===id);if(!p)return;
@@ -903,28 +921,67 @@ function filterPhotos(id,stage,btn){
   const filtered=stage==='all'?photos:photos.filter(ph=>ph.stage===stage);
   const grid=document.getElementById('photo-grid-'+sid);
   if(!grid)return;
+  const stageColors={Before:'#3b82f6',During:'#f59e0b',After:'#22c55e',Defect:'#ef4444',Completion:'#8b5cf6'};
   if(!filtered.length){grid.innerHTML=`<div class="empty-note">No ${stage} photos yet</div>`;return;}
-  grid.innerHTML=filtered.map((ph,i)=>{
+  grid.innerHTML=filtered.map((ph)=>{
     const realIdx=photos.indexOf(ph);
-    const stageBadge=ph.stage?`<div style="position:absolute;top:5px;left:5px;background:rgba(0,0,0,0.75);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:0.5px">${ph.stage}</div>`:'';
-    return`<div class="photo-thumb" onclick="openPhotoDetail('${id}',${realIdx})"><img src="${ph.url}" loading="lazy">${stageBadge}<div class="photo-thumb-note">${ph.note||fmtDate(ph.ts)}</div><button class="photo-thumb-del" onclick="delPhoto(event,'${id}',${realIdx})">✕</button></div>`;
+    const sc=stageColors[ph.stage]||'#6b7a99';
+    const stageBadge=ph.stage?`<div style="position:absolute;top:5px;left:5px;background:${sc};color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:0.5px">${ph.stage}</div>`:'';
+    const gps=ph.lat?`<div style="position:absolute;bottom:22px;right:5px;background:rgba(0,0,0,0.6);color:#fff;font-size:7px;padding:1px 4px;border-radius:3px">📍GPS</div>`:'';
+    return`<div class="photo-thumb" onclick="openPhotoDetail('${id}',${realIdx})"><img src="${ph.url}" loading="lazy">${stageBadge}${gps}<div class="photo-thumb-note">${ph.note||fmtDate(ph.ts)}</div><button class="photo-thumb-del" onclick="delPhoto(event,'${id}',${realIdx})">✕</button></div>`;
   }).join('');
 }
 
-// PHOTO DETAIL (with comments)
+// PHOTO DETAIL — with caption/stage editing + GPS display
 let pdProjectId=null,pdPhotoIdx=null;
 function openPhotoDetail(id,idx){
   const p=projects.find(p=>p.id===id);if(!p)return;
   const ph=p.photos[idx];if(!ph)return;
   pdProjectId=id;pdPhotoIdx=idx;
   document.getElementById('pd-img').src=ph.url;
-  document.getElementById('pd-title').textContent=ph.note||'Site Photo';
-  document.getElementById('pd-note').textContent=ph.note||'';
-  const stageBadge=ph.stage?`<span class="photo-meta-chip" style="background:rgba(245,158,11,0.15);color:var(--accent);border-color:rgba(245,158,11,0.3)">${ph.stage}</span>`:'';
-  document.getElementById('pd-meta').innerHTML=`${stageBadge}<span class="photo-meta-chip">📅 ${fmtDate(ph.ts)}</span>${(ph.comments||[]).length?`<span class="photo-meta-chip">💬 ${ph.comments.length} note${ph.comments.length>1?'s':''}</span>`:''}`;
+  document.getElementById('pd-title').textContent=ph.note||'New Photo';
+  document.getElementById('pd-note').textContent='';
+  // Build meta with GPS
+  const stageColors={Before:'#3b82f6',During:'#f59e0b',After:'#22c55e',Defect:'#ef4444',Completion:'#8b5cf6'};
+  const sc=stageColors[ph.stage]||null;
+  const stageBadge=ph.stage?`<span class="photo-meta-chip" style="background:${sc}22;color:${sc};border-color:${sc}44">${ph.stage}</span>`:'';
+  const gpsBadge=ph.lat?`<span class="photo-meta-chip" title="${ph.lat},${ph.lng}">📍 ${ph.lat}, ${ph.lng}</span>`:'<span class="photo-meta-chip" style="opacity:0.5">📍 No GPS</span>';
+  document.getElementById('pd-meta').innerHTML=`${stageBadge}<span class="photo-meta-chip">📅 ${fmtDate(ph.ts)}</span>${gpsBadge}`;
+  // Caption + stage edit inline in detail
+  const stages=['Before','During','After','Defect','Completion'];
+  document.getElementById('pd-edit').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+      <div class="fin-input-group"><div class="fin-input-label">Caption</div><input class="fin-input" id="pd-caption" value="${(ph.note||'').replace(/"/g,'&quot;')}" placeholder="What's in this photo?"/></div>
+      <div class="fin-input-group"><div class="fin-input-label">Stage</div>
+        <select class="fin-input" id="pd-stage">
+          <option value="">— Stage</option>
+          ${stages.map(s=>`<option value="${s}" ${ph.stage===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <button class="add-log-btn" style="margin-bottom:12px" onclick="savePhotoMeta()">Save Caption & Stage</button>`;
   renderPhotoComments(ph);
   document.getElementById('photo-detail-overlay').classList.add('open');
 }
+
+async function savePhotoMeta(){
+  const p=projects.find(p=>p.id===pdProjectId);if(!p)return;
+  const note=document.getElementById('pd-caption').value.trim();
+  const stage=document.getElementById('pd-stage').value;
+  p.photos[pdPhotoIdx].note=note;
+  p.photos[pdPhotoIdx].stage=stage;
+  await saveProject(p);
+  document.getElementById('pd-title').textContent=note||'Site Photo';
+  const stageColors={Before:'#3b82f6',During:'#f59e0b',After:'#22c55e',Defect:'#ef4444',Completion:'#8b5cf6'};
+  const sc=stageColors[stage]||null;
+  const ph=p.photos[pdPhotoIdx];
+  const stageBadge=stage?`<span class="photo-meta-chip" style="background:${sc}22;color:${sc};border-color:${sc}44">${stage}</span>`:'';
+  const gpsBadge=ph.lat?`<span class="photo-meta-chip" title="${ph.lat},${ph.lng}">📍 ${ph.lat}, ${ph.lng}</span>`:'<span class="photo-meta-chip" style="opacity:0.5">📍 No GPS</span>';
+  document.getElementById('pd-meta').innerHTML=`${stageBadge}<span class="photo-meta-chip">📅 ${fmtDate(ph.ts)}</span>${gpsBadge}`;
+  render();renderAllTabs(pdProjectId);switchTab('photos');
+  showToast('Saved ✓');
+}
+
 function closePhotoDetail(){document.getElementById('photo-detail-overlay').classList.remove('open');pdProjectId=null;pdPhotoIdx=null;}
 function renderPhotoComments(ph){
   const comments=ph.comments||[];
@@ -941,10 +998,7 @@ async function addPhotoComment(){
   input.value='';
   const ph=p.photos[pdPhotoIdx];
   renderPhotoComments(ph);
-  // Rebuild meta completely - avoids fragile querySelector
-  const stageBadge=ph.stage?`<span class="photo-meta-chip" style="background:rgba(245,158,11,0.15);color:var(--accent);border-color:rgba(245,158,11,0.3)">${ph.stage}</span>`:'';
   const cnt=ph.comments.length;
-  document.getElementById('pd-meta').innerHTML=`${stageBadge}<span class="photo-meta-chip">📅 ${fmtDate(ph.ts)}</span><span class="photo-meta-chip">💬 ${cnt} note${cnt>1?'s':''}</span>`;
   showToast('Note added ✓');
 }
 async function delPhotoComment(ci){
@@ -960,84 +1014,71 @@ function openLightbox(url,note,ts){
 }
 function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
 
-// PDF PHOTO REPORT
+// PDF PHOTO REPORT — with SiteDesk logo + GPS coords
 async function generatePhotoReport(id){
   const p=projects.find(p=>p.id===id);if(!p)return;
   const photos=p.photos||[];
   if(!photos.length){showToast('No photos to export');return;}
-  showToast('Building report...');
-  const f=p.finance||{};
-  const lc=tHours(p),mc2=tMats(p),tc=lc+mc2;
-
-  // Convert images to base64 for embedding
-  async function toBase64(url){
-    try{
-      const r=await fetch(url);const b=await r.blob();
-      return new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.readAsDataURL(b);});
-    }catch{return null;}
-  }
-
   showToast('Loading images...');
+  async function toBase64(url){
+    try{const r=await fetch(url);const b=await r.blob();return new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.readAsDataURL(b);});}catch{return null;}
+  }
   const photoData=await Promise.all(photos.slice(0,50).map(async ph=>({...ph,b64:await toBase64(ph.url)})));
-
-  const rows=photoData.map((ph,i)=>{
-    const stageTag=ph.stage?`<span style="background:#f59e0b;color:#000;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">${ph.stage}</span>`:'';
-    const comments=(ph.comments||[]).map(c=>`<div style="margin-top:4px;font-size:11px;color:#666;padding:4px 8px;background:#f5f5f5;border-radius:4px">💬 ${c.text}</div>`).join('');
-    return`<tr>
-      <td style="padding:12px;border:1px solid #e0e0e0;width:44%;vertical-align:top">
-        ${ph.b64?`<img src="${ph.b64}" style="width:100%;border-radius:6px;display:block">`:`<div style="background:#eee;height:120px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#999">Image unavailable</div>`}
+  const stageColors={Before:'#3b82f6',During:'#f59e0b',After:'#22c55e',Defect:'#ef4444',Completion:'#8b5cf6'};
+  const rows=photoData.map((ph)=>{
+    const sc=stageColors[ph.stage]||'#888';
+    const stageTag=ph.stage?`<span style="background:${sc};color:#fff;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:700;display:inline-block;margin-bottom:6px">${ph.stage}</span>`:'';
+    const gpsTag=ph.lat?`<div style="font-size:10px;color:#888;margin-bottom:4px">📍 ${ph.lat}, ${ph.lng}${ph.gpsAcc?` (±${ph.gpsAcc}m)`:''}</div>`:'';
+    const comments=(ph.comments||[]).map(c=>`<div style="margin-top:4px;font-size:11px;color:#555;padding:4px 10px;background:#f5f5f5;border-left:3px solid #ddd;border-radius:0 4px 4px 0">💬 ${c.text}</div>`).join('');
+    return`<tr><td style="padding:12px;border:1px solid #e0e0e0;width:44%;vertical-align:top">
+        ${ph.b64?`<img src="${ph.b64}" style="width:100%;border-radius:6px;display:block">`:`<div style="background:#eee;height:120px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#999;font-size:13px">Image unavailable</div>`}
       </td>
       <td style="padding:12px;border:1px solid #e0e0e0;vertical-align:top">
-        <div style="font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:6px">${ph.note||'No caption'}</div>
-        <div style="margin-bottom:6px">${stageTag}</div>
+        <div style="font-size:14px;font-weight:700;color:#1a1a1a;margin-bottom:8px">${ph.note||'<span style="color:#aaa;font-style:italic">No caption</span>'}</div>
+        ${stageTag}<br>${gpsTag}
         <div style="font-size:11px;color:#888;margin-bottom:8px">📅 ${fmtDate(ph.ts)}</div>
         ${comments}
-      </td>
-    </tr>`;
+      </td></tr>`;
   }).join('');
 
   const html=`<!DOCTYPE html><html>
-<head><meta charset="UTF-8"><title>SiteDesk Photo Report — ${p.name}</title>
+<head><meta charset="UTF-8"><title>SiteDesk Report — ${p.name}</title>
 <style>
-  body{font-family:Arial,sans-serif;margin:0;padding:0;color:#1a1a1a;background:#fff}
-  .header{background:#0d1016;color:#fff;padding:32px 40px;display:flex;align-items:center;justify-content:space-between}
-  .logo{font-size:28px;font-weight:900;letter-spacing:2px}.logo span{color:#f59e0b}
-  .report-title{font-size:13px;color:rgba(255,255,255,0.5);text-align:right}
-  .report-title strong{color:#fff;display:block;font-size:16px;margin-bottom:4px}
-  .summary{background:#f9f9f9;border-bottom:3px solid #f59e0b;padding:20px 40px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-  .sum-item{text-align:center}.sum-num{font-size:24px;font-weight:900;color:#0d1016}.sum-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-top:3px}
-  .section{padding:24px 40px}.section-title{font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:16px;border-bottom:2px solid #f0f0f0;padding-bottom:8px}
-  table{width:100%;border-collapse:collapse}
-  .footer{background:#f5f5f5;border-top:1px solid #e0e0e0;padding:16px 40px;font-size:11px;color:#888;display:flex;justify-content:space-between}
-  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-</style>
-</head>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;background:#fff}
+  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{margin:15mm}}
+</style></head>
 <body>
-<div class="header">
-  <div class="logo">SITE<span>DESK</span></div>
-  <div class="report-title"><strong>📸 Site Photo Report</strong>${new Date().toLocaleDateString('en-IE',{day:'numeric',month:'long',year:'numeric'})}</div>
+<div style="background:#0d1016;color:#fff;padding:28px 36px;display:flex;align-items:center;justify-content:space-between">
+  <div>
+    <div style="font-size:32px;font-weight:900;letter-spacing:3px;line-height:1">SITE<span style="color:#f59e0b">DESK</span></div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;letter-spacing:1px">SITE PHOTO REPORT</div>
+  </div>
+  <div style="text-align:right">
+    <div style="font-size:18px;font-weight:700;color:#fff">${p.name}</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px">${p.client} · ${p.address}</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:3px">${new Date().toLocaleDateString('en-IE',{day:'numeric',month:'long',year:'numeric'})}</div>
+  </div>
 </div>
-<div class="summary">
-  <div class="sum-item"><div class="sum-num">${p.name}</div><div class="sum-label">Project</div></div>
-  <div class="sum-item"><div class="sum-num">${p.client}</div><div class="sum-label">Client</div></div>
-  <div class="sum-item"><div class="sum-num">${photos.length}</div><div class="sum-label">Total Photos</div></div>
-  <div class="sum-item"><div class="sum-num">${p.progress}%</div><div class="sum-label">Complete</div></div>
+<div style="background:#f9f9f9;border-bottom:3px solid #f59e0b;padding:16px 36px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+  <div style="text-align:center"><div style="font-size:22px;font-weight:900;color:#0d1016">${photos.length}</div><div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Total Photos</div></div>
+  <div style="text-align:center"><div style="font-size:22px;font-weight:900;color:#0d1016">${p.progress}%</div><div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Complete</div></div>
+  <div style="text-align:center"><div style="font-size:22px;font-weight:900;color:#0d1016">${p.status}</div><div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Status</div></div>
+  <div style="text-align:center"><div style="font-size:22px;font-weight:900;color:#0d1016">${photos.filter(ph=>ph.lat).length}</div><div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">GPS Tagged</div></div>
 </div>
-<div class="section">
-  <div class="section-title">📸 Photos (${photoData.length} shown)</div>
-  <table>${rows}</table>
+<div style="padding:20px 36px">
+  <table style="width:100%;border-collapse:collapse">${rows}</table>
 </div>
-<div class="footer">
-  <span>Generated by SiteDesk · sitedesk.ie</span>
-  <span>${p.address}</span>
-  <span>Report date: ${new Date().toLocaleDateString('en-IE')}</span>
+<div style="background:#f5f5f5;border-top:1px solid #e0e0e0;padding:14px 36px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#888">
+  <div style="font-size:14px;font-weight:900;letter-spacing:2px;color:#0d1016">SITE<span style="color:#f59e0b">DESK</span> <span style="font-size:10px;font-weight:400;letter-spacing:0;color:#aaa">· sitedesk.ie</span></div>
+  <div>Generated ${new Date().toLocaleDateString('en-IE')} · ${photoData.length} photos shown</div>
 </div>
 </body></html>`;
 
   const blob=new Blob([html],{type:'text/html'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=url;a.download=`SiteDesk-Report-${p.name.replace(/\s+/g,'-')}-${new Date().toISOString().slice(0,10)}.html`;
+  a.href=url;a.download=`SiteDesk-${p.name.replace(/\s+/g,'-')}-${new Date().toISOString().slice(0,10)}.html`;
   a.click();URL.revokeObjectURL(url);
   showToast('Report downloaded ✓');
 }
@@ -1130,7 +1171,7 @@ async function saveFinance(id){
   p.finance.paid=parseFloat(document.getElementById('fp'+sid).value)||0;
   await saveProject(p);render();renderAllTabs(id);switchTab('costs');showToast('Saved ✓');
 }
-async function toggleTask(id,i){const p=projects.find(p=>p.id===id);if(!p)return;p.tasks[i].done=!p.tasks[i].done;await saveProject(p);render();renderAllTabs(id);switchTab('site');}
+async function toggleTask(id,i){const p=projects.find(p=>p.id===id);if(!p)return;p.tasks[i].done=!p.tasks[i].done;await saveProject(p);render();renderAllTabs(id);switchTab('tasks');}
 
 // SUBS
 async function addSub(id){
@@ -1167,24 +1208,25 @@ async function addTask(id){
   await saveProject(p);
   document.getElementById('tt'+sid).value='';
   document.getElementById('td'+sid).value='';
-  render();renderAllTabs(id);switchTab('site');showToast('Task added ✓');
+  render();renderAllTabs(id);switchTab('tasks');showToast('Task added ✓');
 }
 async function delTask(id,i){
   const p=projects.find(p=>p.id===id);if(!p)return;
   p.tasks.splice(i,1);
-  await saveProject(p);render();renderAllTabs(id);switchTab('site');
+  await saveProject(p);render();renderAllTabs(id);switchTab('tasks');
 }
 
-// FILES
+// FILES (kept in data model for existing users, not shown as tab)
 async function addFile(id){
   const p=projects.find(p=>p.id===id);if(!p)return;const sid=id.replace(/-/g,'');
-  const name=document.getElementById('fn'+sid).value.trim();
-  const url=document.getElementById('fu'+sid).value.trim();
+  const name=document.getElementById('fn'+sid)?.value.trim();
+  const url=document.getElementById('fu'+sid)?.value.trim();
   if(!name||!url){showToast('Enter a name and a link');return;}
+  if(!p.files)p.files=[];
   p.files.push({name,url,added:Date.now()});
-  await saveProject(p);render();renderAllTabs(id);switchTab('files');showToast(name+' added');
+  await saveProject(p);showToast(name+' added');
 }
-async function delFile(e,id,i){e.preventDefault();e.stopPropagation();const p=projects.find(p=>p.id===id);if(!p)return;p.files.splice(i,1);await saveProject(p);render();renderAllTabs(id);switchTab('files');}
+async function delFile(e,id,i){e.preventDefault();e.stopPropagation();const p=projects.find(p=>p.id===id);if(!p)return;if(!p.files)return;p.files.splice(i,1);await saveProject(p);showToast('File removed');}
 
 // ADD PROJECT
 function openModal(){document.getElementById('modal-overlay').classList.add('open');}
