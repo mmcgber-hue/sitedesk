@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>SiteDesk</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d1016">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SiteDesk">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -390,6 +396,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-hei
   </div>
   <div class="projects-list" id="projects-list"></div>
   <div style="display:flex;gap:8px;margin:18px 16px 0">
+    <button class="export-csv-btn" style="margin-top:0;display:none;border-color:var(--accent);color:var(--accent)" id="install-btn" onclick="installApp()">📲 Install App</button>
     <button class="export-csv-btn" style="margin-top:0" onclick="exportBackup()">💾 Backup All Data</button>
     <button class="export-csv-btn" style="margin-top:0" onclick="document.getElementById('restore-input').click()">📥 Restore</button>
     <input type="file" id="restore-input" accept=".json,application/json" style="display:none" onchange="importBackup(this)"/>
@@ -2290,6 +2297,24 @@ document.addEventListener('keydown',e=>{
 
 // ── PATCH 3: Start form persistence before init ──
 setupFormPersistence();
+// ── PWA: service worker + install prompt ──
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW failed:',e.message)));
+}
+let deferredInstall=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredInstall=e;
+  const b=document.getElementById('install-btn');
+  if(b)b.style.display='block';
+});
+async function installApp(){
+  if(!deferredInstall)return;
+  deferredInstall.prompt();
+  const {outcome}=await deferredInstall.userChoice;
+  if(outcome==='accepted'){document.getElementById('install-btn').style.display='none';showToast('Installed ✓');}
+  deferredInstall=null;
+}
+window.addEventListener('appinstalled',()=>{const b=document.getElementById('install-btn');if(b)b.style.display='none';});
 init();
 </script>
 </body>

@@ -1,27 +1,15 @@
 {
   "name": "SiteDesk",
   "short_name": "SiteDesk",
-  "description": "Construction project management built for the real world",
-  "start_url": "/",
+  "description": "Project management for builders — jobs, hours, materials, photos and plans.",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#0d1016",
-  "theme_color": "#f59e0b",
   "orientation": "portrait",
+  "background_color": "#0d1016",
+  "theme_color": "#0d1016",
   "icons": [
-    {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%230d1016'/><text x='96' y='125' font-family='Arial Black,sans-serif' font-size='72' font-weight='900' text-anchor='middle' fill='%23fff'>S<tspan fill='%23f59e0b'>D</tspan></text></svg>",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%230d1016'/><text x='256' y='330' font-family='Arial Black,sans-serif' font-size='192' font-weight='900' text-anchor='middle' fill='%23fff'>S<tspan fill='%23f59e0b'>D</tspan></text></svg>",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    }
-  ],
-  "categories": ["business", "productivity"],
-  "lang": "en",
-  "dir": "ltr"
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
 }

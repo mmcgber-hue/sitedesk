@@ -1,43 +1,51 @@
-const CACHE_NAME = 'sitedesk-v1';
-const PRECACHE = [
-  '/',
-  '/index.html'
+// SiteDesk service worker — offline app shell
+const CACHE = 'sitedesk-v1'; // bump this when you deploy a new index.html
+const SHELL = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
-// Install — precache shell
 self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(PRECACHE))
-      .then(() => self.skipWaiting())
-  );
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
 });
 
-// Activate — clean old caches
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
 });
 
-// Fetch — network first, fall back to cache
 self.addEventListener('fetch', e => {
-  // Skip non-GET and chrome-extension requests
-  if (e.request.method !== 'GET') return;
-  if (e.request.url.startsWith('chrome-extension://')) return;
+  const url = new URL(e.request.url);
 
+  // Never intercept Supabase (API, auth, storage) or any non-GET request
+  if (e.request.method !== 'GET' || url.hostname.includes('supabase')) return;
+
+  // App shell: network-first so updates arrive, cache fallback for offline
+  if (url.origin === location.origin) {
+    e.respondWith(
+      fetch(e.request)
+        .then(res => {
+          const copy = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, copy));
+          return res;
+        })
+        .catch(() => caches.match(e.request).then(m => m || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // CDN assets (fonts, supabase-js, pdf.js): cache-first — they're versioned
   e.respondWith(
-    fetch(e.request)
-      .then(response => {
-        // Cache successful responses for offline use
-        if (response.ok && e.request.url.startsWith(self.location.origin)) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
-        }
-        return response;
-      })
-      .catch(() => caches.match(e.request))
+    caches.match(e.request).then(m => m || fetch(e.request).then(res => {
+      const copy = res.clone();
+      caches.open(CACHE).then(c => c.put(e.request, copy));
+      return res;
+    }))
   );
 });
